@@ -1,0 +1,3 @@
+pandas
+fhir.resources
+mysql.connector
