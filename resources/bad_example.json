@@ -1,0 +1,49 @@
+{
+    "resourceType": "Bundle",
+    "type": "transaction",
+    "entry": [
+        {
+            "resource": {
+                "resourceType": "Observation",
+                "id": "observation-1",
+                "subject": {
+                    "reference": "Patient/patient-1"
+                }
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "Patient",
+                "id": "patient-1",
+                "socialSecurityNumber": "123-45-6789",
+                "name": [
+                    {
+                        "given": "John",
+                        "family": "Doe"
+                    }
+                ]
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "Patient",
+                "id": "patient-2",
+                "name": [
+                    {
+                        "given": "Jane",
+                        "family": "Doe"
+                    }
+                ]
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "Observation",
+                "id": "observation-2",
+                "subject": {
+                    "reference": "Patient/patient-2"
+                }
+            }
+        }
+    ]
+}
