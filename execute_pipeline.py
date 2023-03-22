@@ -49,11 +49,11 @@ for json_obj in patient_json_list:
     test_suite = unittest.TestLoader().loadTestsFromTestCase(TestFHIRData)
     test_results = test_runner.run(test_suite)
 
+
+print("Creating raw tabular dataset")
+# write the raw tabular data to a csv file. This needs to be normalized and cleaned before it can be used for analysis.
 FHIR_patient_object_list = [Patient.parse_obj(Bundle.parse_obj(patient_json).entry[0].resource) for patient_json in patient_json_list]
 patient_df = rd.patients_to_dataframe(FHIR_patient_object_list).drop(columns=['resource_type']) # we can drop this column because it is constant by definition
-
-
-# write the raw tabular data to a csv file. This needs to be normalized and cleaned before it can be used for analysis.
 print("Writing raw tabular data to csv file in 0NF format")
 patient_df.to_csv('data_output/patient_data_tabular_raw.csv', index=False)
 
@@ -61,6 +61,7 @@ patient_df.to_csv('data_output/patient_data_tabular_raw.csv', index=False)
 # 1NF normalization - each table cell should have a single value
 # the columns in the dataframe in need of normalization are extension, address, maritalStatus, name, telecom, etc.
 # a naive solution would be to explode the columns that are lists. This, however, tends to become monolithic, as the number of table rows grows exponentially.
+print("Creating 1NF tabular dataset")
 print("exploding column: extension")
 patient_exploded_df = patient_df.explode('extension') # start by exploding extension - the first column of type list
 for column in patient_df.columns.drop('extension'):
@@ -73,6 +74,7 @@ patient_exploded_df.to_csv('data_output/1NF_data/patient_data_tabular.csv', inde
 
 # 2NF normalization - create additional tables for initial table cells with multiple/list entires
 # this is a more complex solution, but it is more scalable, easier to maintain, and there is less data redundancy
+print("Creating 2NF tabular dataset")
 patient_df_2NF = patient_df.copy()
 for column in patient_df_2NF.columns:
     if type(patient_df_2NF[column][0]) == list:
@@ -92,10 +94,10 @@ patient_df_2NF.to_csv('data_output/2NF_data/patient_data_tabular.csv', index=Fal
 
 
 # get/open the connection to the patient database
+print("Creating patient database and relevant tables")
 patient_database_conn = cd.connect_to_sqla_server()
 
 # dropping tables if they already exist
-print("Writing 2NF tabular data to SQL database")
 patient_database_conn.execute(text("DROP TABLE IF EXISTS patient"))
 patient_database_conn.execute(text("DROP TABLE IF EXISTS address"))
 patient_database_conn.execute(text("DROP TABLE IF EXISTS communication"))
@@ -204,6 +206,7 @@ ud.execute_sql(TWONF_CREATE_TELECOM_TABLE_SQL, patient_database_conn)
 
 # populate the main table
 patient_df = pd.read_csv('data_output/2NF_data/patient_data_tabular.csv')
+print("Writing 2NF tabular data to SQL database")
 
 def replace_quotes(df): # this can mess up formatting
     """
@@ -222,7 +225,8 @@ for index, row in patient_df.iterrows():
 
 # populate the sub tables
 sub_table_list = rd.get_file_list('data_output/2NF_data')
-for table in sub_table_list[:-1]: # populate all sub tables
+sub_table_list.remove('patient_data_tabular.csv')
+for table in sub_table_list: # populate all sub tables
     table_data = pd.read_csv('data_output/2NF_data/'+table)
     table_name = str(table_data.columns[1]) # same as the second column name
     for index, row in table_data.iterrows():
@@ -234,6 +238,7 @@ for table in sub_table_list[:-1]: # populate all sub tables
 
 
 # example of how to query the database
+print("Example 2NF tabulated dataset query")
 result = patient_database_conn.execute(text("SELECT * FROM extension"))
 df = pd.DataFrame(result.all(), columns=result.keys())
 print(df)
