@@ -4,6 +4,8 @@ sys.path.insert(1, '..')
 import pandas as pd
 import json
 import importlib
+import requests
+import tools.misc as misc
 for k,v in list(sys.modules.items()):
     if k.startswith('tools'):
         importlib.reload(v)
@@ -55,3 +57,44 @@ def read_json_files(directory:str):
     except:
         print("Error: Could not read file - please pass a different directory or filename")
 
+
+# we also need to be able to read from an API if this is how the data is being sent - although this is not particularly secure
+def get_json_objects_from_API(url:str):
+    '''
+    Queries a given API / URL and returns a list of JSON objects
+    :param url: the API / URL to query
+    :return: a list of JSON objects
+    '''
+    response = requests.get(url)
+    if response.status_code == 200:
+        json_data = response.json()
+        return json_data
+    else:
+        print(f"Error: {response.status_code} - {response.reason}")
+
+
+def patients_to_dataframe(patients:list):
+    """
+    Converts a list of FHIR Patient objects to a pandas dataframe.
+    :param patients: a list of FHIR Patient objects
+    :return: a pandas dataframe
+    """
+    columns = misc.get_patient_field_list()
+    data = []
+
+    for patient in patients:
+        row = []
+        for attr in columns:
+            if hasattr(patient, attr):
+                value = getattr(patient, attr)
+                if isinstance(value, list):
+                    value = [str(item) if not isinstance(item, (int, float, bool)) else item for item in value]
+                elif not isinstance(value, (int, float, bool)):
+                    value = str(value)
+                row.append(value)
+            else:
+                row.append(None)
+        data.append(row)
+
+    patient_df = pd.DataFrame(data, columns=columns)
+    return patient_df
