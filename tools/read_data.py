@@ -46,9 +46,12 @@ def read_json_files(directory:str):
     :param directory: The directory containing the JSON files.
     :yield: A dictionary representing the contents of a JSON file.
     """
-    for filename in os.listdir(directory):
-        filepath = os.path.join(directory, filename)
-        if filename.endswith('.json') and os.path.isfile(filepath):
-            with open(filepath, 'r') as file:
-                yield json.load(file)
+    try:
+        for filename in os.listdir(directory):
+            filepath = os.path.join(directory, filename)
+            if filename.endswith('.json') and os.path.isfile(filepath):
+                with open(filepath, 'r') as file:
+                    yield json.load(file)
+    except:
+        print("Error: Could not read file - please pass a different directory or filename")
 

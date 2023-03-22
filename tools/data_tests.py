@@ -1,7 +1,7 @@
 import unittest
-import json
 import importlib
 import sys
+from fhir.resources.bundle import Bundle
 for k,v in list(sys.modules.items()):
     if k.startswith('tools'):
         importlib.reload(v)
@@ -13,6 +13,13 @@ class TestFHIRData(unittest.TestCase):
     def test_patient_is_first_entry_in_list(self):
         if self.JSON_OBJ['entry'][0]['resource']['resourceType'] != "Patient":
             self.assertEqual(self.JSON_OBJ['entry'][0]['resource']['resourceType'], "Patient", msg="Patient object not first in entry list")
+
+    
+    def test_json_obj_is_fhir_bundle(self):
+        try:
+            Bundle.parse_obj(self.JSON_OBJ)
+        except:
+            self.fail("JSON object is not a FHIR Bundle")
 
 
     def test_only_one_patient_field_per_bundle(self):
