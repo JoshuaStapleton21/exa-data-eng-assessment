@@ -11,17 +11,17 @@ for k,v in list(sys.modules.items()):
         importlib.reload(v)
 
 
-def get_patient_file_list(directory:str):
+def get_file_list(directory:str):
     '''
-    Returns a list of all the patient files in the directory
+    Returns a list of all files in a directory
     :param directory: the directory to search
-    :return: a str list of all the patient files in the directory
+    :return: a str list of all the files in the directory
     '''
-    patient_file_list = []
+    file_list = []
     try:
         for (dirpath, dirnames, filenames) in os.walk(directory):
-            patient_file_list.extend(filenames)
-        return patient_file_list
+            file_list.extend(filenames)
+        return file_list
     except:
         print("Error: Could not find directory")
 
