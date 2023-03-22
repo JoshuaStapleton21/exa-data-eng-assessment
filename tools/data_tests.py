@@ -14,7 +14,7 @@ class TestFHIRData(unittest.TestCase):
         if self.JSON_OBJ['entry'][0]['resource']['resourceType'] != "Patient":
             self.assertEqual(self.JSON_OBJ['entry'][0]['resource']['resourceType'], "Patient", msg="Patient object not first in entry list")
 
-    
+    # this test should be sufficient to cover everything as it fully parses an FHIR object from .json
     def test_json_obj_is_fhir_bundle(self):
         try:
             Bundle.parse_obj(self.JSON_OBJ)
