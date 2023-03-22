@@ -82,16 +82,25 @@ Ensure to pass in the database connection strings as environment variables in th
 
 
 `exa-data-eng-assessment` - This directory contains the main pipeline code.
+
 `data` - Directory hosting the raw input FHIR .json data files which are to be processed by the pipeline.
+
 `data_output` - Directory hosting the processed tabular .csv data files which have been processed by the pipeline and written out in various normalizations.
+
 `EDA` - This directory contains the Jupyter notebook used to explore the FHIR data and perform some basic EDA.
+
 `resources` - This directory contains the bad_example.json file which is used to test the pipeline's error handling.
+
 `tools` - This directory contains various tooling modules used by the pipeline.
+
 `Dockerfile` - This file is used to build the Docker image for the pipeline.
+
 `execute_pipeline.ipynb` - This Jupyter notebook is used to run the pipeline in interactive mode.
+
 `execute_pipeline.py` - This is the main Python script that initiates the pipeline.
+
 `README.md` - This file contains the project documentation.
+
 `requirements.txt` - This file contains the Python dependencies required by the pipeline.
 
-
-The repository also contains support for secure environment variables using the python-dotenv module. The .env file is not included in the repository for security reasons, but the following variables are required to run the pipeline. Please add the necessary variables to a .env file in the root directory of the project.
+The repository also contains support for secure environment variables using the python-dotenv module. The .env file is not included in the repository for security reasons. Please add the necessary variables to a .env file in the root directory of the project, or by passing them in as environment variables in the docker run command as above.
