@@ -65,12 +65,16 @@ def get_json_objects_from_API(url:str):
     :param url: the API / URL to query
     :return: a list of JSON objects
     '''
-    response = requests.get(url)
-    if response.status_code == 200:
-        json_data = response.json()
-        return json_data
-    else:
-        print(f"Error: {response.status_code} - {response.reason}")
+    # this assumes a list of json objects is returned
+    responses = requests.get(url)
+    json_data_list = []
+    for response in responses:
+        if response.status_code == 200:
+            json_data = response.json()
+            json_data_list.append(json_data)
+        else:
+            print(f"Error: {response.status_code} - {response.reason}")
+    return json_data_list
 
 
 def patients_to_dataframe(patients:list):
